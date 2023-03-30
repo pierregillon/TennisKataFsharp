@@ -1,6 +1,6 @@
 module TennisGameModule
 
-type Score =
+type Point =
     | Love
     | Fifty
     | Thirty
@@ -13,24 +13,26 @@ let increaseScore point =
     | Thirty -> Forty
     | _ -> failwith "not implemented: cannot increase point"
 
-type TennisGame =
-    | GameScore of Score * Score
-    | Player1Won
-    | Player2Won
+type Player =
+    | PlayerOne
+    | PlayerTwo
 
-let setupGame: TennisGame = GameScore(Love, Love)
+type Score =
+    | Points of Point * Point
+    | Game of Player
 
-let playerWin (game: TennisGame) updateScore : TennisGame =
-    match game with
-    | Player1Won -> failwith "already won"
-    | Player2Won -> failwith "already won"
-    | GameScore (Forty, _) -> Player1Won
-    | GameScore (_, Forty) -> Player2Won
-    | GameScore (player1Score, player2Score) -> updateScore (player1Score, player2Score)
+let setupGame: Score = Points(Love, Love)
+
+let playerWin (score: Score) updateScore : Score =
+    match score with
+    | Game _ -> failwith "already won"
+    | Points (Forty, _) -> Game PlayerOne
+    | Points (_, Forty) -> Game PlayerTwo
+    | Points (player1Score, player2Score) -> updateScore (player1Score, player2Score)
     | _ -> failwith "invalid case"
 
-let player1Win (game: TennisGame) : TennisGame =
-    playerWin game (fun (x, y) -> GameScore(increaseScore x, y))
+let player1Win (game: Score) : Score =
+    playerWin game (fun (x, y) -> Points(increaseScore x, y))
 
-let player2Win (game: TennisGame) : TennisGame =
-    playerWin game (fun (x, y) -> GameScore(x, (increaseScore y)))
+let player2Win (game: Score) : Score =
+    playerWin game (fun (x, y) -> Points(x, (increaseScore y)))
