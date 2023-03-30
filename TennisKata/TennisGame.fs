@@ -20,13 +20,17 @@ type Player =
 type Score =
     | Points of Point * Point
     | Deuce
+    | Advantage of Player
     | Game of Player
 
 let setupGame: Score = Points(Love, Love)
 
-let playerWin score player : Score =
-    match score with
+let playerWin currentScore player : Score =
+    match currentScore with
     | Game _ -> failwith "already won"
+    | Deuce -> Advantage player
+    | Advantage otherPlayer when otherPlayer <> player -> Deuce
+    | Advantage player -> Game player
     | Points (Forty, _) when player = PlayerOne -> Game PlayerOne
     | Points (_, Forty) when player = PlayerTwo -> Game PlayerTwo
     | Points (player1Score, player2Score) ->
@@ -39,6 +43,6 @@ let playerWin score player : Score =
         if newScore = Points(Forty, Forty) then Deuce else newScore
     | _ -> failwith "invalid case"
 
-let player1Win (game: Score) : Score = playerWin game PlayerOne
+let playerOneWin (score: Score) : Score = playerWin score PlayerOne
 
-let player2Win (game: Score) : Score = playerWin game PlayerTwo
+let playerTwoWin (score: Score) : Score = playerWin score PlayerTwo
