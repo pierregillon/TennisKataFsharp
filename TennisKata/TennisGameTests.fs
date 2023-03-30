@@ -32,3 +32,16 @@ let ``At thirty, winning a point increases player's score to forty`` () =
 let ``At forty, winning a point increases player's score to win`` () =
     let game = setupGame |> player1Win |> player1Win |> player1Win |> player1Win
     Assert.Equal(Game PlayerOne, game)
+
+[<Fact>]
+let ``Two players at forty updates score to deuce`` () =
+    let game =
+        setupGame
+        |> player1Win
+        |> player1Win
+        |> player1Win
+        |> player2Win
+        |> player2Win
+        |> player2Win
+
+    Assert.Equal(Deuce, game)
